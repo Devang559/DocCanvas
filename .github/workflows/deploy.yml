@@ -30,9 +30,7 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm ci
+        run: npm ci
 
       - name: Build release APK
         run: |
