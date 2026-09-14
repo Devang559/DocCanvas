@@ -108,3 +108,12 @@ jobs:
           name: doccanvas-release-zip
           path: release/DocCanvas.zip
           retention-days: 30
+      
+
+      - name: Upload R8 missing rules (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+         name: r8-missing-rules
+         path: android/app/build/outputs/mapping/release/missing_rules.txt
+         retention-days: 7
