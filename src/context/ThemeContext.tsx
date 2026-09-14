@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useContext } from 'react';
-import { colors } from './theme';
+import { colors } from '../utils/theme';
 
 export interface Theme {
   dark: boolean;

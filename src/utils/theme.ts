@@ -11,6 +11,7 @@ export const colors = {
   input: '#e5e5e5',
   destructive: '#ef4444',
   destructiveForeground: '#ffffff',
+  highlight: '#fef3c7',
   slate: {
     50: '#f8fafc',
     100: '#f1f5f9',

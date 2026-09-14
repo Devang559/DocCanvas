@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { colors, shadowStyles, borderRadius } from './theme';
+import { colors, shadowStyles, borderRadius } from '../utils/theme';
 
 interface PromptModalProps {
   visible: boolean;

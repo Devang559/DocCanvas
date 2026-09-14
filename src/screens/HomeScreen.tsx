@@ -5,7 +5,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import {
   Plus,
@@ -16,15 +15,14 @@ import {
   ReceiptText,
   NotebookPen,
 } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, shadowStyles } from './theme';
-import { useDocuments } from './DocumentContext';
-import { useDocumentActions } from './useDocumentActions';
-import AppHeader from './AppHeader';
-import TileButton from './TileButton';
-import RecentDocRow from './RecentDocRow';
-import BottomNavBar from './BottomNavBar';
-import type { Template } from './types';
+import { colors, shadowStyles } from '../utils/theme';
+import { useDocuments } from '../context/DocumentContext';
+import { useDocumentActions } from '../hooks/useDocumentActions';
+import AppHeader from '../components/AppHeader';
+import TileButton from '../components/TileButton';
+import RecentDocRow from '../components/RecentDocRow';
+import BottomNavBar from '../components/BottomNavBar';
+import type { Template } from '../types';
 import type { ComponentType } from 'react';
 
 const QUICK_TILES: {
@@ -40,11 +38,8 @@ const QUICK_TILES: {
 ];
 
 const TILE_GAP = 8;
-const screenW = Dimensions.get('window').width;
-const tileW = (screenW - 32 - TILE_GAP * 2) / 3;
 
 const HomeScreen = () => {
-  const insets = useSafeAreaInsets();
   const { documents, templates } = useDocuments();
   const { createNew, applyTemplate, viewAll, openEditor, confirmImport } =
     useDocumentActions();
@@ -52,7 +47,8 @@ const HomeScreen = () => {
   const handleTile = useCallback(
     (action: string) => {
       const find = (cat: string): Template | undefined =>
-        templates.find((t) => t.category === cat);
+        templates.find(t => t.category === cat);
+
       switch (action) {
         case 'blank':
           createNew();
@@ -81,9 +77,11 @@ const HomeScreen = () => {
     .slice(0, 3);
 
   return (
-    <View style={[styles.screen, { paddingBottom: 64 + insets.bottom }]}>
-      <AppHeader title="DocCanvas" onCreatePress={createNew} />
+    <View style={styles.screen}>
+      <AppHeader title="DocCanvas" />
+
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -104,6 +102,7 @@ const HomeScreen = () => {
             <Plus size={16} color={colors.primaryForeground} />
             <Text style={styles.primaryBtnText}>Create new document</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             aria-label="Import PDF"
             style={[styles.outlineBtn, shadowStyles.card]}
@@ -115,23 +114,38 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.tilesRow}>
-          {QUICK_TILES.map((t) => (
-            <View key={t.label} style={{ width: tileW }}>
+        <View style={styles.tilesContainer}>
+          <View style={styles.tileGrid}>
+            {QUICK_TILES.slice(0, 3).map(t => (
               <TileButton
+                key={t.label}
                 icon={t.icon}
                 label={t.label}
                 iconColor={colors.primary}
                 onPress={() => handleTile(t.action)}
                 ariaLabel={t.label}
               />
-            </View>
-          ))}
+            ))}
+          </View>
+
+          <View style={styles.tileGrid}>
+            {QUICK_TILES.slice(3).map(t => (
+              <TileButton
+                key={t.label}
+                icon={t.icon}
+                label={t.label}
+                iconColor={colors.primary}
+                onPress={() => handleTile(t.action)}
+                ariaLabel={t.label}
+              />
+            ))}
+          </View>
         </View>
 
         <View style={styles.recentSection}>
           <View style={styles.recentHeader}>
             <Text style={styles.h2}>Recent documents</Text>
+
             <TouchableOpacity
               aria-label="View all documents"
               onPress={viewAll}
@@ -140,14 +154,16 @@ const HomeScreen = () => {
               <Text style={styles.viewAll}>View all</Text>
             </TouchableOpacity>
           </View>
+
           <Text style={styles.storageNote}>
             Your documents are stored locally on this device.
           </Text>
+
           <View style={styles.recentList}>
             {recent.length === 0 ? (
               <Text style={styles.empty}>No recent documents yet.</Text>
             ) : (
-              recent.map((doc) => (
+              recent.map(doc => (
                 <RecentDocRow
                   key={doc.id}
                   doc={doc}
@@ -158,6 +174,7 @@ const HomeScreen = () => {
           </View>
         </View>
       </ScrollView>
+
       <BottomNavBar />
     </View>
   );
@@ -168,25 +185,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+
+  scrollView: {
+    flex: 1,
+  },
+
   scrollContent: {
     paddingTop: 32,
     paddingHorizontal: 16,
     paddingBottom: 32,
     gap: 24,
   },
-  hero: { gap: 8 },
+
+  hero: {
+    gap: 8,
+  },
+
   h1: {
     fontSize: 24,
     fontWeight: '600',
     color: colors.foreground,
     letterSpacing: -0.5,
   },
+
   subtitle: {
     fontSize: 13,
     color: colors.mutedForeground,
     lineHeight: 18,
   },
-  actionBtns: { gap: 8 },
+
+  actionBtns: {
+    gap: 12,
+  },
+
   primaryBtn: {
     backgroundColor: colors.primary,
     borderRadius: 16,
@@ -196,11 +227,13 @@ const styles = StyleSheet.create({
     gap: 8,
     height: 48,
   },
+
   primaryBtnText: {
     color: colors.primaryForeground,
     fontSize: 13,
     fontWeight: '500',
   },
+
   outlineBtn: {
     backgroundColor: colors.background,
     borderRadius: 16,
@@ -212,38 +245,54 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
   },
+
   outlineBtnText: {
     color: colors.foreground,
     fontSize: 13,
     fontWeight: '500',
   },
-  tilesRow: {
+
+  tilesContainer: {
+    gap: 12,
+  },
+
+  tileGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: TILE_GAP,
   },
-  recentSection: { gap: 12 },
+
+  recentSection: {
+    gap: 12,
+  },
+
   recentHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   h2: {
     fontSize: 18,
     fontWeight: '600',
     color: colors.foreground,
     letterSpacing: -0.25,
   },
+
   viewAll: {
     color: colors.primary,
     fontSize: 13,
     fontWeight: '500',
   },
+
   storageNote: {
     fontSize: 11,
     color: colors.mutedForeground,
   },
-  recentList: { gap: 8 },
+
+  recentList: {
+    gap: 8,
+  },
+
   empty: {
     color: colors.mutedForeground,
     fontSize: 13,

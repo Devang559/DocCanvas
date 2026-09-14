@@ -1,97 +1,197 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# DocCanvas
 
-# Getting Started
+A React Native CLI mobile application for creating, editing, and managing documents on Android.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Overview
 
-## Step 1: Start Metro
+DocCanvas provides a canvas-style document editor where users can compose multi-page documents with text elements, shapes, images, and more. The app supports text formatting, element locking, highlighting, and PDF export.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Features
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- **Multi-page document editor** with a canvas-based layout
+- **Text elements**: Title, subtitle, headings, and paragraphs with:
+  - Color selection (8 preset colors)
+  - Highlight color with 6 preset options
+  - Text alignment (left, center, right)
+  - Lock/unlock to prevent accidental edits
+- **Shape elements** with:
+  - Line shapes rendered via SVG
+  - Adjustable stroke thickness (1px–12px)
+  - Fill color customization
+- **Image elements** with library picker integration
+- **Element management**: select, duplicate, delete, rotate
+- **PDF export**: Download documents as PDF files via HTML-to-PDF conversion
+- **Document list** with categories and search
+- **Templates** for quick document creation
+- **Settings**: Dark mode, page size, font selection, and export quality
+
+## Project Structure
+
+```
+DocCanvas/
+├── android/                  # Android native project
+│   ├── app/
+│   │   ├── build.gradle      # App-level Gradle config
+│   │   ├── proguard-rules.pro
+│   │   ├── debug.keystore
+│   │   └── src/
+│   │       └── main/
+│   ├── build.gradle          # Project-level Gradle config
+│   └── gradle.properties
+├── ios/                      # iOS native project
+├── src/
+│   ├── App.tsx               # Root component with navigation
+│   ├── types.ts              # TypeScript type definitions
+│   ├── components/           # Reusable UI components
+│   │   ├── AppHeader.tsx
+│   │   ├── BottomNavBar.tsx
+│   │   ├── Chip.tsx
+│   │   ├── DocumentListItem.tsx
+│   │   ├── PromptModal.tsx
+│   │   ├── RecentDocRow.tsx
+│   │   ├── SelectDropdown.tsx
+│   │   ├── TemplateCard.tsx
+│   │   ├── TileButton.tsx
+│   │   └── Toast.tsx
+│   ├── context/              # React Context providers
+│   │   ├── DocumentContext.tsx
+│   │   ├── SettingsContext.tsx
+│   │   └── ThemeContext.tsx
+│   ├── hooks/                # Custom hooks
+│   │   ├── useDocumentActions.ts
+│   │   └── useHistory.ts
+│   ├── screens/              # Screen components
+│   │   ├── DocumentsScreen.tsx
+│   │   ├── EditorScreen.tsx
+│   │   ├── HomeScreen.tsx
+│   │   ├── SettingsScreen.tsx
+│   │   └── TemplatesScreen.tsx
+│   └── utils/
+│       ├── dateUtils.ts
+│       └── theme.ts
+├── __tests__/                # Jest tests
+├── .github/workflows/        # CI/CD pipelines
+├── index.js                  # App entry point
+├── package.json
+├── tsconfig.json
+├── babel.config.js
+└── metro.config.js
+```
+
+## Tech Stack
+
+| Category | Technology |
+|----------|-----------|
+| Framework | React Native 0.87.1 (CLI, not Expo) |
+| Language | TypeScript 6.0 |
+| Navigation | React Navigation 7 (native-stack) |
+| UI Icons | Lucide React Native |
+| SVG Rendering | react-native-svg |
+| Storage | @react-native-async-storage/async-storage |
+| Image Picker | react-native-image-picker |
+| PDF Generation | react-native-html-to-pdf |
+| File System | react-native-fs |
+| JavaScript Engine | Hermes |
+| Build Tool | Gradle (Android) |
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 22.11.0
+- Java 17 (JDK)
+- Android Studio with Android SDK
+- Android SDK 37 (or compatible)
+
+### Setup
 
 ```sh
-# Using npm
+# Install dependencies
+npm install
+
+# (Android only) Install native modules
+npx react-native run-android
+
+# Start Metro bundler
 npm start
 
-# OR using Yarn
-yarn start
+# Run the app
+npm run android
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+### Development
 
 ```sh
-# Using npm
+# Start Metro development server
+npm start
+
+# Run Android
 npm run android
 
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# Run iOS (macOS only)
 npm run ios
 
-# OR using Yarn
-yarn ios
+# Run linter
+npm run lint
+
+# Run tests
+npm test
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Core Components
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### EditorScreen (`src/screens/EditorScreen.tsx`)
 
-## Step 3: Modify your app
+The main document editing interface. Key features:
 
-Now that you have successfully run the app, let's make changes!
+- **Canvas**: Renders document pages with draggable elements
+- **Tools toolbar**: Text, Image, Shape, Color, Thickness, Highlight tools
+- **Element actions bar**: Lock, delete, color, thickness, alignment controls
+- **Page strip**: Navigate between document pages
+- **PanResponder**: Handles drag, pinch-to-scale, and rotation gestures
+- **PDF export**: Generates downloadable PDF files from document content
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### DocumentContext (`src/context/DocumentContext.tsx`)
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+Manages document state including:
+- Document CRUD operations
+- AsyncStorage persistence
+- Content synchronization
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### SettingsContext (`src/context/SettingsContext.tsx`)
 
-## Congratulations! :tada:
+Manages app settings:
+- Dark mode toggle
+- Page size (A4, Letter)
+- Font selection (Inter, Arial, Georgia)
+- Export quality (High, Medium, Low)
 
-You've successfully run and modified your React Native App. :partying_face:
+### ThemeContext (`src/context/ThemeContext.tsx`)
 
-### Now what?
+Provides theme colors and dark mode support.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## Build & Deploy
 
-# Troubleshooting
+### Debug Build
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+```sh
+cd android
+./gradlew assembleDebug
+```
 
-# Learn More
+### Release Build
 
-To learn more about React Native, take a look at the following resources:
+```sh
+cd android
+./gradlew assembleRelease
+```
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+The release APK will be generated at `android/app/build/outputs/apk/release/app-release.apk`.
+
+### CI/CD
+
+GitHub Actions automatically builds and deploys on every push to `main`. See [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+## License
+
+Private project.

@@ -25,7 +25,6 @@ DerivedData
 # Android/IntelliJ
 #
 build/
-.idea
 .gradle
 local.properties
 *.iml
@@ -34,18 +33,34 @@ local.properties
 *.keystore
 !debug.keystore
 .kotlin/
+.android/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.ap_
+*.aab
+
+# Android release artifacts
+android/app/build/
+android/build/
+android/**/*.apk
+android/**/*.ap_
+android/**/*.aab
 
 # node.js
 #
 node_modules/
 npm-debug.log
 yarn-error.log
+package-lock-temp.yaml
+.npmrc
 
 # fastlane
 #
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
 # screenshots whenever they are needed.
-# For more information about the recommended setup visit:
+# For more information on the recommended setup visit:
 # https://docs.fastlane.tools/best-practices/source-control/
 
 **/fastlane/report.xml
@@ -66,10 +81,34 @@ yarn-error.log
 # testing
 /coverage
 
-# Yarn
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+ehthumbs_vista.thumbcache_*.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor
+*.orig
+*.merge
+*.rebase
+
+# Build output
+dist/
+temp/
+tmp/

@@ -5,14 +5,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'react-native';
 
 import { RootStackParamList } from './types';
-import { DocumentProvider } from './DocumentContext';
-import { SettingsProvider, useSettings } from './SettingsContext';
-import { ThemeProvider } from './ThemeContext';
-import HomeScreen from './HomeScreen';
-import DocumentsScreen from './DocumentsScreen';
-import TemplatesScreen from './TemplatesScreen';
-import EditorScreen from './EditorScreen';
-import SettingsScreen from './SettingsScreen';
+import { DocumentProvider } from './context/DocumentContext';
+import { SettingsProvider, useSettings } from './context/SettingsContext';
+import { ThemeProvider } from './context/ThemeContext';
+import HomeScreen from './screens/HomeScreen';
+import DocumentsScreen from './screens/DocumentsScreen';
+import TemplatesScreen from './screens/TemplatesScreen';
+import EditorScreen from './screens/EditorScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -22,7 +22,7 @@ function AppContent() {
 
   return (
     <ThemeProvider dark={dark}>
-      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+      <StatusBar hidden />
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Home"

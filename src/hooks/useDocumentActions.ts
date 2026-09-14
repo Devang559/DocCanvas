@@ -1,13 +1,17 @@
 import { useCallback } from 'react';
 import { Alert } from 'react-native';
-import { useDocuments } from './DocumentContext';
+import { useDocuments } from '../context/DocumentContext';
 import { useNavigation } from '@react-navigation/native';
-import type { RootStackNavigationProp, DocumentContent, Template } from './types';
+import type {
+  RootStackNavigationProp,
+  DocumentContent,
+  Template,
+} from '../types';
 
 export const BLANK_CONTENT: DocumentContent = {
-  title: 'Untitled document',
+  title: '',
   subtitle: '',
-  sections: [{ id: 'sec-1', heading: '', paragraphs: [''] }],
+  sections: [],
 };
 
 export function useDocumentActions() {
@@ -45,9 +49,7 @@ export function useDocumentActions() {
       content: {
         title: 'Imported Document',
         subtitle: 'Q2 Growth Strategy',
-        sections: [
-          { id: 'sec-1', heading: 'Overview', paragraphs: [''] },
-        ],
+        sections: [{ id: 'sec-1', heading: 'Overview', paragraphs: [''] }],
         goalBars: [30, 60, 90, 70, 50],
       },
     });
@@ -77,5 +79,12 @@ export function useDocumentActions() {
     );
   }, [importPdf]);
 
-  return { createNew, importPdf, applyTemplate, viewAll, openEditor, confirmImport };
+  return {
+    createNew,
+    importPdf,
+    applyTemplate,
+    viewAll,
+    openEditor,
+    confirmImport,
+  };
 }

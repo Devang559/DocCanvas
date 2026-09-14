@@ -9,26 +9,21 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import {
-  Search,
-  SlidersHorizontal,
-  Plus,
-} from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, shadowStyles } from './theme';
-import { useDocuments } from './DocumentContext';
-import { useDocumentActions } from './useDocumentActions';
-import AppHeader from './AppHeader';
-import Chip from './Chip';
-import DocumentListItem from './DocumentListItem';
-import PromptModal from './PromptModal';
-import BottomNavBar from './BottomNavBar';
-import type { Document } from './types';
+import { Search, SlidersHorizontal, Plus } from 'lucide-react-native';
+
+import { colors, shadowStyles } from '../utils/theme';
+import { useDocuments } from '../context/DocumentContext';
+import { useDocumentActions } from '../hooks/useDocumentActions';
+import AppHeader from '../components/AppHeader';
+import Chip from '../components/Chip';
+import DocumentListItem from '../components/DocumentListItem';
+import PromptModal from '../components/PromptModal';
+import BottomNavBar from '../components/BottomNavBar';
+import type { Document } from '../types';
 
 const CATEGORIES = ['All', 'PDFs', 'Resumes', 'Templates'];
 
 const DocumentsScreen = () => {
-  const insets = useSafeAreaInsets();
   const { documents, deleteDocument, updateDocument, createDocument } =
     useDocuments();
   const { createNew, openEditor } = useDocumentActions();
@@ -39,12 +34,12 @@ const DocumentsScreen = () => {
   const filtered = useCallback(() => {
     let list = documents;
     if (activeCat !== 'All') {
-      list = list.filter((d) => d.category === activeCat);
+      list = list.filter(d => d.category === activeCat);
     }
     if (search.trim().length > 0) {
       const q = search.toLowerCase();
       list = list.filter(
-        (d) =>
+        d =>
           d.fileName.toLowerCase().includes(q) ||
           d.title.toLowerCase().includes(q),
       );
@@ -52,12 +47,9 @@ const DocumentsScreen = () => {
     return [...list].sort((a, b) => b.lastEdited - a.lastEdited);
   }, [documents, activeCat, search]);
 
-  const handleRename = useCallback(
-    (doc: Document) => {
-      setRenameDoc(doc);
-    },
-    [],
-  );
+  const handleRename = useCallback((doc: Document) => {
+    setRenameDoc(doc);
+  }, []);
 
   const confirmRename = useCallback(
     (title: string) => {
@@ -66,7 +58,9 @@ const DocumentsScreen = () => {
         const updated = {
           ...renameDoc,
           title,
-          fileName: `${title}.${ext === 'pdf' ? 'pdf' : ext === 'tpl' ? 'tpl' : 'docx'}`,
+          fileName: `${title}.${
+            ext === 'pdf' ? 'pdf' : ext === 'tpl' ? 'tpl' : 'docx'
+          }`,
         };
         updateDocument(updated);
       }
@@ -110,8 +104,8 @@ const DocumentsScreen = () => {
   );
 
   return (
-    <View style={[styles.screen, { paddingBottom: 64 + insets.bottom }]}>
-      <AppHeader title="DocCanvas" onCreatePress={createNew} />
+    <View style={styles.screen}>
+      <AppHeader title="DocCanvas" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -136,15 +130,11 @@ const DocumentsScreen = () => {
             aria-label="Filter / sort"
             activeOpacity={0.7}
             onPress={() =>
-              Alert.alert(
-                'Sort by',
-                'Choose a sort order.',
-                [
-                  { text: 'Newest first', style: 'default' },
-                  { text: 'Name A–Z', style: 'default' },
-                  { text: 'Cancel', style: 'cancel' },
-                ],
-              )
+              Alert.alert('Sort by', 'Choose a sort order.', [
+                { text: 'Newest first', style: 'default' },
+                { text: 'Name A–Z', style: 'default' },
+                { text: 'Cancel', style: 'cancel' },
+              ])
             }
           >
             <SlidersHorizontal size={16} color={colors.mutedForeground} />
@@ -152,7 +142,7 @@ const DocumentsScreen = () => {
         </View>
 
         <View style={styles.chips}>
-          {CATEGORIES.map((cat) => (
+          {CATEGORIES.map(cat => (
             <Chip
               key={cat}
               label={cat}
@@ -168,7 +158,7 @@ const DocumentsScreen = () => {
           {filtered().length === 0 ? (
             <Text style={styles.empty}>No documents match.</Text>
           ) : (
-            filtered().map((doc) => (
+            filtered().map(doc => (
               <DocumentListItem
                 key={doc.id}
                 doc={doc}

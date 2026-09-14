@@ -1,53 +1,93 @@
+
 import React from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   House,
   Files,
   LayoutTemplate,
   Settings,
 } from 'lucide-react-native';
-import { colors, shadowStyles } from './theme';
-import { useTheme } from './ThemeContext';
+import { colors, shadowStyles } from '../utils/theme';
+import { useTheme } from '../context/ThemeContext';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
-import type { RootStackParamList } from './types';
+import type { RootStackParamList } from '../types';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface TabConfig {
   name: keyof RootStackParamList;
   label: string;
-  Icon: React.ComponentType<{ size?: number; color?: string }>;
+  Icon: React.ComponentType<{
+    size?: number;
+    color?: string;
+  }>;
 }
 
 const TABS: TabConfig[] = [
-  { name: 'Home', label: 'Home', Icon: House },
-  { name: 'Documents', label: 'Documents', Icon: Files },
-  { name: 'Templates', label: 'Templates', Icon: LayoutTemplate },
-  { name: 'Settings', label: 'Settings', Icon: Settings },
+  {
+    name: 'Home',
+    label: 'Home',
+    Icon: House,
+  },
+  {
+    name: 'Documents',
+    label: 'Documents',
+    Icon: Files,
+  },
+  {
+    name: 'Templates',
+    label: 'Templates',
+    Icon: LayoutTemplate,
+  },
+  {
+    name: 'Settings',
+    label: 'Settings',
+    Icon: Settings,
+  },
 ];
 
 export const BottomNavBar: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const focused = useNavigationState((state) => state.routes[state.index].name);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const focused = useNavigationState(
+    (state) => state.routes[state.index].name,
+  );
+
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
 
   const handlePress = (name: keyof RootStackParamList) => {
     if (name === focused) {
       return;
     }
-    (navigation.navigate as (s: keyof RootStackParamList) => void)(name);
+
+    (navigation.navigate as (
+      screen: keyof RootStackParamList,
+    ) => void)(name);
   };
 
   return (
-    <View style={[styles.nav, shadowStyles.card, { backgroundColor: theme.card, borderTopColor: theme.border }]}>
+    <View
+      style={[
+        styles.nav,
+        shadowStyles.card,
+        {
+          backgroundColor: theme.card,
+          borderTopColor: theme.border,
+          paddingBottom: insets.bottom,
+        },
+      ]}
+    >
       {TABS.map((tab) => {
         const isActive = focused === tab.name;
         const tint = isActive ? colors.primary : theme.foreground;
+
         return (
           <TouchableOpacity
             key={tab.name}
@@ -58,7 +98,17 @@ export const BottomNavBar: React.FC = () => {
             activeOpacity={0.7}
           >
             <tab.Icon size={20} color={tint} />
-            <Text style={[styles.tabLabel, { color: tint }]}>{tab.label}</Text>
+
+            <Text
+              style={[
+                styles.tabLabel,
+                {
+                  color: tint,
+                },
+              ]}
+            >
+              {tab.label}
+            </Text>
           </TouchableOpacity>
         );
       })}
@@ -69,17 +119,17 @@ export const BottomNavBar: React.FC = () => {
 const styles = StyleSheet.create({
   nav: {
     flexDirection: 'row',
-    backgroundColor: colors.background,
+    minHeight: 0,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.border,
-    height: 64,
-    paddingBottom: Platform.select({ ios: 12, android: 6 }),
   },
+
   tab: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 4,
   },
+
   tabLabel: {
     fontSize: 10,
     fontWeight: '500',

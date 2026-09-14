@@ -7,7 +7,7 @@ import React, {
   ReactNode,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Document, Template, DocType, DocumentContent } from './types';
+import { Document, Template, DocType, DocumentContent } from '../types';
 
 const STORAGE_KEY = '@doccanvas:documents';
 

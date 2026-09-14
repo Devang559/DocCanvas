@@ -6,7 +6,7 @@ import {
   ViewStyle,
   StyleProp,
 } from 'react-native';
-import { colors, shadowStyles, borderRadius } from './theme';
+import { colors, shadowStyles, borderRadius } from '../utils/theme';
 
 interface ToastProps {
   visible: boolean;

@@ -6,7 +6,7 @@ import {
   ViewStyle,
   StyleProp,
 } from 'react-native';
-import { colors, borderRadius } from './theme';
+import { colors, borderRadius } from '../utils/theme';
 
 export type ChipVariant = 'filter' | 'category' | 'tab';
 

@@ -6,13 +6,13 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { Plus } from 'lucide-react-native';
-import { colors, shadowStyles } from './theme';
-import { useTheme } from './ThemeContext';
+import { Plus, Sparkle } from 'lucide-react-native';
+import { colors, shadowStyles } from '../utils/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface AppHeaderProps {
   title: string;
-  onCreatePress: () => void;
+  onCreatePress?: () => void;
   buttonSize?: 'sm' | 'md';
 }
 
@@ -41,16 +41,21 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         },
       ]}
     >
-      <Text style={[styles.title, { color: theme.foreground }]}>{title}</Text>
-      <TouchableOpacity
-        aria-label="Create new document"
-        accessibilityRole="button"
-        style={[styles.createBtn, buttonStyle]}
-        onPress={onCreatePress}
-        activeOpacity={0.7}
-      >
-        <Plus size={isSm ? 18 : 20} color={colors.primaryForeground} />
-      </TouchableOpacity>
+      <View style={styles.titleContainer}>
+        <Sparkle size={20} color={colors.primary} />
+        <Text style={[styles.title, { color: theme.foreground }]}>{title}</Text>
+      </View>
+      {onCreatePress ? (
+        <TouchableOpacity
+          aria-label="Create new document"
+          accessibilityRole="button"
+          style={[styles.createBtn, buttonStyle]}
+          onPress={onCreatePress}
+          activeOpacity={0.7}
+        >
+          <Plus size={isSm ? 18 : 20} color={colors.primaryForeground} />
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };
@@ -72,11 +77,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 56,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   title: {
-    fontSize: 17,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: colors.foreground,
-    letterSpacing: 0.25,
+    letterSpacing: -0.5,
   },
   createBtn: {
     backgroundColor: colors.primary,

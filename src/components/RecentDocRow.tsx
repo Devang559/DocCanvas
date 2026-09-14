@@ -6,9 +6,9 @@ import {
   StyleSheet,
 } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
-import { colors, shadowStyles } from './theme';
-import { Document } from './types';
-import { formatRelativeTime } from './dateUtils';
+import { colors, shadowStyles } from '../utils/theme';
+import { Document } from '../types';
+import { formatRelativeTime } from '../utils/dateUtils';
 
 interface FilePreviewThumbProps {
   type: Document['type'];

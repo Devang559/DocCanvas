@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-} from 'react-native';
-import { colors, shadowStyles } from './theme';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { colors, shadowStyles } from '../utils/theme';
 
 interface TileButtonProps {
   icon: React.ComponentType<{ size?: number; color?: string }>;
@@ -47,16 +43,18 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
     borderLeftWidth: StyleSheet.hairlineWidth,
     borderLeftColor: colors.border,
+    flex: 1,
     minWidth: 0,
     paddingVertical: 12,
     paddingHorizontal: 8,
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
     minHeight: 80,
   },
   tileLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '500',
     color: colors.cardForeground,
     textAlign: 'center',

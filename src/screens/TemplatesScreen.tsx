@@ -1,20 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from './theme';
-import { useDocuments } from './DocumentContext';
-import { useDocumentActions } from './useDocumentActions';
-import AppHeader from './AppHeader';
-import Chip from './Chip';
-import TemplateCard from './TemplateCard';
-import BottomNavBar from './BottomNavBar';
-import type { Template } from './types';
+import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import { colors } from '../utils/theme';
+import { useDocuments } from '../context/DocumentContext';
+import { useDocumentActions } from '../hooks/useDocumentActions';
+import AppHeader from '../components/AppHeader';
+import Chip from '../components/Chip';
+import TemplateCard from '../components/TemplateCard';
+import BottomNavBar from '../components/BottomNavBar';
+import type { Template } from '../types';
 
 const CATEGORY_CHIPS = [
   'Resumes',
@@ -32,16 +25,15 @@ const screenW = Dimensions.get('window').width;
 const cardW = (screenW - 32 - GAP) / 2;
 
 const TemplatesScreen = () => {
-  const insets = useSafeAreaInsets();
   const { templates } = useDocuments();
-  const { createNew, applyTemplate } = useDocumentActions();
+  const { applyTemplate } = useDocumentActions();
   const [activeCat, setActiveCat] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     if (!activeCat) {
       return templates;
     }
-    return templates.filter((t) => t.category === activeCat);
+    return templates.filter(t => t.category === activeCat);
   }, [templates, activeCat]);
 
   const handleUse = useCallback(
@@ -54,8 +46,8 @@ const TemplatesScreen = () => {
   const visibleChips = ['All', ...CATEGORY_CHIPS];
 
   return (
-    <View style={[styles.screen, { paddingBottom: 64 + insets.bottom }]}>
-      <AppHeader title="DocCanvas" onCreatePress={createNew} buttonSize="sm" />
+    <View style={styles.screen}>
+      <AppHeader title="DocCanvas" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -65,7 +57,7 @@ const TemplatesScreen = () => {
         </View>
 
         <View style={styles.chips}>
-          {visibleChips.map((cat) => (
+          {visibleChips.map(cat => (
             <Chip
               key={cat}
               label={cat}
@@ -75,7 +67,7 @@ const TemplatesScreen = () => {
               ariaLabel={cat}
             />
           ))}
-          {CATEGORY_CHIPS.map((cat) => (
+          {CATEGORY_CHIPS.map(cat => (
             <Chip
               key={cat}
               label={cat}
@@ -91,9 +83,12 @@ const TemplatesScreen = () => {
           {filtered.length === 0 ? (
             <Text style={styles.empty}>No templates in this category.</Text>
           ) : (
-            filtered.map((template) => (
+            filtered.map(template => (
               <View key={template.id} style={{ width: cardW }}>
-                <TemplateCard template={template} onUse={() => handleUse(template)} />
+                <TemplateCard
+                  template={template}
+                  onUse={() => handleUse(template)}
+                />
               </View>
             ))
           )}

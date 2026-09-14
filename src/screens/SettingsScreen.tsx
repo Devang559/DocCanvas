@@ -9,55 +9,21 @@ import {
   Alert,
 } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, shadowStyles } from './theme';
-import { useDocuments } from './DocumentContext';
-import { useDocumentActions } from './useDocumentActions';
-import { useTheme } from './ThemeContext';
-import AppHeader from './AppHeader';
-import { SelectTrigger } from './SelectDropdown';
-import Toast from './Toast';
-import BottomNavBar from './BottomNavBar';
-import type { Theme } from './ThemeContext';
 
-const PAGE_SIZE_OPTIONS: string[] = ['A4', 'Letter', 'Legal', 'A5'];
-const FONT_OPTIONS: string[] = ['Inter', 'Georgia', 'Helvetica', 'Times New Roman'];
-const EXPORT_QUALITY_OPTIONS: string[] = ['Low', 'Medium', 'High', 'Original'];
-
-type SettingsState = {
-  defaultPageSize: string;
-  defaultFont: string;
-  autosave: boolean;
-  showPageThumbnails: boolean;
-  snapToGrid: boolean;
-  darkMode: boolean;
-  hapticFeedback: boolean;
-  exportQuality: string;
-};
-
-const useSettingsStore = () => {
-  const settings: SettingsState = {
-    defaultPageSize: PAGE_SIZE_OPTIONS[0],
-    defaultFont: FONT_OPTIONS[0],
-    autosave: true,
-    showPageThumbnails: true,
-    snapToGrid: false,
-    darkMode: false,
-    hapticFeedback: true,
-    exportQuality: EXPORT_QUALITY_OPTIONS[2],
-  };
-
-  const updateSetting = (_key: keyof SettingsState, _value: string | boolean) => {
-    // This screen only requires the store API shape to compile in environments
-    // where the app settings module is unavailable.
-  };
-
-  const reset = async () => {
-    // No-op fallback for missing settings module.
-  };
-
-  return { settings, updateSetting, reset };
-};
+import { colors, shadowStyles } from '../utils/theme';
+import { useDocuments } from '../context/DocumentContext';
+import { useTheme } from '../context/ThemeContext';
+import AppHeader from '../components/AppHeader';
+import { SelectTrigger } from '../components/SelectDropdown';
+import Toast from '../components/Toast';
+import BottomNavBar from '../components/BottomNavBar';
+import type { Theme } from '../context/ThemeContext';
+import {
+  useSettings,
+  PAGE_SIZE_OPTIONS,
+  FONT_OPTIONS,
+  EXPORT_QUALITY_OPTIONS,
+} from '../context/SettingsContext';
 
 const SettingsSwitchRow: React.FC<{
   label: string;
@@ -99,10 +65,8 @@ const SettingsSelectRow: React.FC<{
 );
 
 const SettingsScreen = () => {
-  const insets = useSafeAreaInsets();
-  const { settings, updateSetting, reset } = useSettingsStore();
+  const { settings, updateSetting, reset } = useSettings();
   const { clearAllDocuments } = useDocuments();
-  const { createNew } = useDocumentActions();
   const theme = useTheme();
   const [toast, setToast] = useState('');
 
@@ -147,10 +111,12 @@ const SettingsScreen = () => {
     <View
       style={[
         styles.screen,
-        { backgroundColor: theme.background, paddingBottom: 64 + insets.bottom },
+        {
+          backgroundColor: theme.background,
+        },
       ]}
     >
-      <AppHeader title="DocCanvas" onCreatePress={createNew} buttonSize="sm" />
+      <AppHeader title="DocCanvas" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -172,20 +138,20 @@ const SettingsScreen = () => {
             label="Default page size"
             value={settings.defaultPageSize}
             options={PAGE_SIZE_OPTIONS}
-            onSelect={(v) => updateSetting('defaultPageSize', v)}
+            onSelect={v => updateSetting('defaultPageSize', v)}
             theme={theme}
           />
           <SettingsSelectRow
             label="Default font"
             value={settings.defaultFont}
             options={FONT_OPTIONS}
-            onSelect={(v) => updateSetting('defaultFont', v)}
+            onSelect={v => updateSetting('defaultFont', v)}
             theme={theme}
           />
           <SettingsSwitchRow
             label="Autosave"
             value={settings.autosave}
-            onValueChange={(v) => updateSetting('autosave', v)}
+            onValueChange={v => updateSetting('autosave', v)}
             theme={theme}
           />
         </View>
@@ -199,19 +165,19 @@ const SettingsScreen = () => {
           <SettingsSwitchRow
             label="Show page thumbnails"
             value={settings.showPageThumbnails}
-            onValueChange={(v) => updateSetting('showPageThumbnails', v)}
+            onValueChange={v => updateSetting('showPageThumbnails', v)}
             theme={theme}
           />
           <SettingsSwitchRow
             label="Snap to grid"
             value={settings.snapToGrid}
-            onValueChange={(v) => updateSetting('snapToGrid', v)}
+            onValueChange={v => updateSetting('snapToGrid', v)}
             theme={theme}
           />
           <SettingsSwitchRow
             label="Dark mode"
             value={settings.darkMode}
-            onValueChange={(v) => {
+            onValueChange={v => {
               updateSetting('darkMode', v);
               setToast(v ? 'Dark mode enabled' : 'Light mode enabled');
             }}
@@ -220,7 +186,7 @@ const SettingsScreen = () => {
           <SettingsSwitchRow
             label="Haptic feedback"
             value={settings.hapticFeedback}
-            onValueChange={(v) => updateSetting('hapticFeedback', v)}
+            onValueChange={v => updateSetting('hapticFeedback', v)}
             theme={theme}
           />
         </View>
@@ -235,7 +201,7 @@ const SettingsScreen = () => {
             label="Export quality"
             value={settings.exportQuality}
             options={EXPORT_QUALITY_OPTIONS}
-            onSelect={(v) => updateSetting('exportQuality', v)}
+            onSelect={v => updateSetting('exportQuality', v)}
             theme={theme}
           />
         </View>
@@ -280,7 +246,10 @@ const SettingsScreen = () => {
             <TouchableOpacity
               style={styles.aboutRowBorder}
               onPress={() =>
-                Alert.alert('Privacy', 'DocCanvas stores all documents locally.')
+                Alert.alert(
+                  'Privacy',
+                  'DocCanvas stores all documents locally.',
+                )
               }
               activeOpacity={0.7}
             >

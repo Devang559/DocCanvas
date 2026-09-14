@@ -8,7 +8,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Check, ChevronDown } from 'lucide-react-native';
-import { colors, shadowStyles } from './theme';
+import { colors, shadowStyles } from '../utils/theme';
 
 interface SelectDropdownProps {
   visible: boolean;

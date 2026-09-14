@@ -6,8 +6,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LayoutTemplate } from 'lucide-react-native';
-import { colors, shadowStyles } from './theme';
-import { Template } from './types';
+import { colors, shadowStyles } from '../utils/theme';
+import { Template } from '../types';
 
 interface TemplateCardProps {
   template: Template;
