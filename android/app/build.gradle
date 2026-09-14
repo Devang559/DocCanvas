@@ -101,6 +101,8 @@ def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
@@ -110,6 +112,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation 'com.tom-roush:pdfbox-android:2.0.27.0'
+    implementation 'com.gemalto.jp2:jp2-decoder:1.0.0' 
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
