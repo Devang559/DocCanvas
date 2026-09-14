@@ -54,3 +54,20 @@
 -keep class kotlin.Metadata { *; }
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault
 
+
+# PDFBox and JP2 Decoder
+-keep class com.gemalto.** { *; }
+-dontwarn com.gemalto.**
+-keep class com.tom_roush.pdfbox.** { *; }
+-dontwarn com.tom_roush.pdfbox.**
+-keep class org.apache.pdfbox.** { *; }
+-dontwarn org.apache.pdfbox.**
+
+# AsyncStorage generated classes
+-keep class com.reactnative.asyncstorage.** { *; }
+-keep class androidx.asyncstorage.** { *; }
+-dontwarn com.reactnative.asyncstorage.**
+
+# HTML to PDF
+-keep class com.tom_roush.** { *; }
+-dontwarn com.tom_roush.**
