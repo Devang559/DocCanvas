@@ -16,8 +16,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-           node-version: 22
-           cache: npm
+          node-version: 22
+          cache: npm
 
       - name: Setup Java 17
         uses: actions/setup-java@v5
@@ -47,12 +47,10 @@ jobs:
             -name "*.apk" \
             -not -name "*unaligned*" \
             | head -1)
-
           if [ -z "$APK_PATH" ]; then
             echo "ERROR: APK was not found!"
             exit 1
           fi
-
           echo "APK found at: $APK_PATH"
           echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
 
@@ -60,6 +58,32 @@ jobs:
         run: |
           mkdir -p release
           cp "${{ steps.apk.outputs.apk_path }}" release/DocCanvas.apk
+
+      - name: Enable KVM (for emulator)
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run release APK on emulator and capture logcat
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          arch: x86_64
+          profile: pixel_6
+          script: |
+            adb install release/DocCanvas.apk
+            adb shell monkey -p <your.package.name> -c android.intent.category.LAUNCHER 1
+            sleep 15
+            adb logcat -d > release/logcat.txt
+            adb shell am force-stop <your.package.name>
+
+      - name: Upload logcat artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doccanvas-release-logcat
+          path: release/logcat.txt
+          retention-days: 7
 
       - name: Compress APK to ZIP
         run: |
