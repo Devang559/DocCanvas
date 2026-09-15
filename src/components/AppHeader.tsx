@@ -43,18 +43,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     >
       <View style={styles.titleContainer}>
         <Sparkle size={20} color={colors.primary} />
-        <Text style={[styles.title, { color: theme.foreground }]}>{title}</Text>
+      <Text style={[styles.title, { color: theme.foreground }]}>{title}</Text>
       </View>
       {onCreatePress ? (
-        <TouchableOpacity
-          aria-label="Create new document"
-          accessibilityRole="button"
-          style={[styles.createBtn, buttonStyle]}
-          onPress={onCreatePress}
-          activeOpacity={0.7}
-        >
-          <Plus size={isSm ? 18 : 20} color={colors.primaryForeground} />
-        </TouchableOpacity>
+      <TouchableOpacity
+        aria-label="Create new document"
+        accessibilityRole="button"
+        style={[styles.createBtn, buttonStyle]}
+        onPress={onCreatePress}
+        activeOpacity={0.7}
+      >
+        <Plus size={isSm ? 18 : 20} color={colors.primaryForeground} />
+      </TouchableOpacity>
       ) : null}
     </View>
   );
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     borderRightWidth: StyleSheet.hairlineWidth,
     borderRightColor: colors.border,
     flexDirection: 'row',
-    paddingHorizontal: 16,
+    paddingHorizontal: 16, 
     justifyContent: 'space-between',
     alignItems: 'center',
     height: 56,
