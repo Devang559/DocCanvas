@@ -48,11 +48,13 @@ jobs:
       # -----------------------------
       - name: Install Android SDK packages
         run: |
-          sdkmanager --update || true
-          sdkmanager \
-          "platform-tools" \
-          "platforms;android-35" \
-          "build-tools;36.0.0"
+         sdkmanager --update || true
+         sdkmanager \
+         "platform-tools" \
+         "platforms;android-35" \
+         "build-tools;35.0.0"  # ← Change from 36.0.0 to 35.0.0
+
+
 
       # -----------------------------
       # 6. Accept licenses

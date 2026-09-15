@@ -3,7 +3,7 @@ buildscript {
         minSdkVersion = 24
         compileSdkVersion = 37
         targetSdkVersion = 36
-        ndkVersion = "28.0.12433566"  // Update to a newer compatible version
+        ndkVersion = "27.0.12077973"  // ← Change from 28.0.12433566 to 27.0.12077973
         kotlinVersion = "2.2.0"
     }
     repositories {
