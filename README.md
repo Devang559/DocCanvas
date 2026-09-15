@@ -190,7 +190,14 @@ The release APK will be generated at `android/app/build/outputs/apk/release/app-
 
 ### CI/CD
 
-GitHub Actions automatically builds and deploys on every push to `main`. See [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+GitHub Actions automatically builds and deploys on every push to `main`. See [`.github/workflows/deploy.yml`](.github/workflows/
+deploy.yml).
+
+
+# DocCanvas
+
+[![Download APK](https://img.shields.io/badge/Download-APK-brightgreen?style=for-the-badge&logo=android)](https://github.com/Devang559/DocCanvas/releases/latest)
+A React Native CLI mobile application for creating, editing, and managing documents on Android.
 
 ## License
 
