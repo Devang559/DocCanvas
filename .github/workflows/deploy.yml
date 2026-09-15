@@ -31,6 +31,12 @@ jobs:
           api-level: 35
           build-tools: 35.0.0
           ndk: 27.0.12077973
+          packages: 'platforms;android-35 build-tools;35.0.0 ndk;27.0.12077973'
+
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          yes | $ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager --licenses || true
 
       - name: Install dependencies
         run: npm ci
