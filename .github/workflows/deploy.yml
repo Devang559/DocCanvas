@@ -11,16 +11,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: 'npm'
 
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -28,22 +28,16 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 35
-          build-tools: 35.0.0
-          ndk: 27.0.12077973
+          api-level: 34
+          build-tools: 34.0.0
+          ndk: 26.1.10909125
           cache: true
-          packages: |
-            platforms;android-35
-            build-tools;35.0.0
-            ndk;27.0.12077973
-            cmdline-tools;latest
+          packages: tools
 
       - name: Accept Android SDK Licenses
         run: |
           mkdir -p $ANDROID_HOME/licenses
           echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" > $ANDROID_HOME/licenses/android-sdk-license
-          echo "84831b9409646a918e30573bab4c9c91346d8abd" > $ANDROID_HOME/licenses/android-sdk-preview-license
-          echo "d56f5187479451eabf01fb78af6dfcb131b33910" > $ANDROID_HOME/licenses/google-play-services-license
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
 
       - name: Install dependencies
@@ -74,14 +68,14 @@ jobs:
           echo "ZIP created at: $ZIP_PATH"
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: doccanvas-release-apk
           path: ${{ steps.apk.outputs.apk_path }}
           retention-days: 30
 
       - name: Upload ZIP artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: doccanvas-release-zip
           path: ${{ steps.apk.outputs.apk_path }}.zip
