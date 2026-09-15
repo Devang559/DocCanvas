@@ -48,15 +48,11 @@ jobs:
       # -----------------------------
       - name: Install Android SDK packages
         run: |
-         sdkmanager --update || true
-         sdkmanager \
-         "platform-tools" \
-         "platforms;android-35" \
-         "build-tools;36.0.0"
-
-
-
-
+          sdkmanager --update || true
+          sdkmanager \
+          "platform-tools" \
+          "platforms;android-35" \
+          "build-tools;36.0.0"
 
       # -----------------------------
       # 6. Accept licenses
@@ -67,8 +63,9 @@ jobs:
 
       - name: Clean Gradle cache
         run: |
-         cd android
-         ./gradlew clean
+          cd android
+          chmod +x ./gradlew
+          ./gradlew clean
 
       # -----------------------------
       # 7. Install npm dependencies
@@ -98,19 +95,14 @@ jobs:
       # -----------------------------
       - name: Build release APK
         run: |
-         cd android
-         chmod +x ./gradlew
-         ./gradlew assembleRelease \
-         --no-daemon \
-         --max-workers=2 \
-         -Dorg.gradle.parallel=false \
-         --warning-mode all \
-         --stacktrace
-
-
-
-
-
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleRelease \
+          --no-daemon \
+          --max-workers=2 \
+          -Dorg.gradle.parallel=false \
+          --warning-mode all \
+          --stacktrace
 
       # -----------------------------
       # 10. Locate APK
