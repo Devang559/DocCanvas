@@ -52,7 +52,7 @@ jobs:
          sdkmanager \
          "platform-tools" \
          "platforms;android-35" \
-         "build-tools;37.0.0"
+         "build-tools;36.0.0"
 
 
 
@@ -64,6 +64,11 @@ jobs:
       - name: Accept Android SDK licenses
         run: |
           yes | sdkmanager --licenses || true
+
+      - name: Clean Gradle cache
+        run: |
+         cd android
+         ./gradlew clean
 
       # -----------------------------
       # 7. Install npm dependencies
