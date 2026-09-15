@@ -30,8 +30,13 @@ jobs:
         with:
           accept-android-sdk-licenses: true
 
+      - name: Accept Android SDK licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
       - name: Install required SDK packages
         run: |
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
           sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" "ndk;26.1.10909125"
 
       - name: Install dependencies
