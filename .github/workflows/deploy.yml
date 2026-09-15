@@ -31,13 +31,34 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          if [ -d "$ANDROID_HOME" ]; then
+            echo "ANDROID_HOME directory contents:"
+            ls -la "$ANDROID_HOME/"
+            find "$ANDROID_HOME" -name "sdkmanager" 2>/dev/null || true
+          fi
+          if [ -d "$ANDROID_SDK_ROOT" ] && [ "$ANDROID_SDK_ROOT" != "$ANDROID_HOME" ]; then
+            echo "ANDROID_SDK_ROOT directory contents:"
+            ls -la "$ANDROID_SDK_ROOT/"
+            find "$ANDROID_SDK_ROOT" -name "sdkmanager" 2>/dev/null || true
+          fi
           SDK_MANAGER=""
-          if [ -f "$ANDROID_HOME/tools/bin/sdkmanager" ]; then
-            SDK_MANAGER="$ANDROID_HOME/tools/bin/sdkmanager"
-          elif [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-            SDK_MANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          else
-            echo "ERROR: sdkmanager not found"
+          for candidate in \
+            "$ANDROID_HOME/tools/bin/sdkmanager" \
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "$ANDROID_SDK_ROOT/tools/bin/sdkmanager" \
+            "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" \
+            "/usr/local/lib/android/sdk/tools/bin/sdkmanager" \
+            "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager"; do
+            if [ -f "$candidate" ]; then
+              SDK_MANAGER="$candidate"
+              echo "Found sdkmanager at: $SDK_MANAGER"
+              break
+            fi
+          done
+          if [ -z "$SDK_MANAGER" ]; then
+            echo "ERROR: sdkmanager not found in any expected location"
             exit 1
           fi
           yes | $SDK_MANAGER --update || true
