@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -25,20 +29,24 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
-
       - name: Install Android SDK packages
         run: |
-          export ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
-          export PATH="$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
-          yes | sdkmanager --update || true
-          sdkmanager \
+          SDK_MANAGER=""
+          if [ -f "$ANDROID_HOME/tools/bin/sdkmanager" ]; then
+            SDK_MANAGER="$ANDROID_HOME/tools/bin/sdkmanager"
+          elif [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SDK_MANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          else
+            echo "ERROR: sdkmanager not found"
+            exit 1
+          fi
+          yes | $SDK_MANAGER --update || true
+          yes | $SDK_MANAGER \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0" \
             "ndk;27.0.12077973"
-          yes | sdkmanager --licenses || true
+          yes | $SDK_MANAGER --licenses || true
 
       - name: Install dependencies
         run: npm ci
