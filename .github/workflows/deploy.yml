@@ -98,15 +98,19 @@ jobs:
       # -----------------------------
       - name: Build release APK
         run: |
-          cd android
-          chmod +x ./gradlew
+         cd android
+         chmod +x ./gradlew
+         ./gradlew assembleRelease \
+         --no-daemon \
+         --max-workers=2 \
+         -Dorg.gradle.parallel=false \
+         --warning-mode all \
+         --stacktrace
 
-          ./gradlew assembleRelease \
-            --no-daemon \
-            --max-workers=2 \
-            -Dorg.gradle.parallel=false \
-            --warning-mode all \
-            --stacktrace
+
+
+
+
 
       # -----------------------------
       # 10. Locate APK
