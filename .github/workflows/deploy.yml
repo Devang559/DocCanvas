@@ -10,227 +10,68 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -----------------------------
-      # 1. Checkout
-      # -----------------------------
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      # -----------------------------
-      # 2. Node.js
-      # -----------------------------
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: '22'
+          cache: 'npm'
 
-      # -----------------------------
-      # 3. Java 17
-      # -----------------------------
       - name: Setup Java 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: "17"
-          cache: gradle
+          distribution: 'temurin'
+          java-version: '17'
 
-      # -----------------------------
-      # 4. Android SDK
-      # -----------------------------
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: "platform-tools"
-
-      # -----------------------------
-      # 5. Install required SDK
-      # -----------------------------
       - name: Install Android SDK packages
         run: |
-         sdkmanager --update || true
-         sdkmanager \
-         "platform-tools" \
-         "platforms;android-35" \
-         "build-tools;35.0.0" \
-         "ndk;26.1.10909125"
-         yes | sdkmanager --licenses || true
-
-
-      # -----------------------------
-      # 6. Accept licenses
-      # -----------------------------
-      - name: Accept Android SDK licenses
-        run: |
+          sdkmanager --update || true
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0" \
+            "ndk;27.0.12077973"
           yes | sdkmanager --licenses || true
 
-      # -----------------------------
-      # 7. Install npm dependencies (MOVED HERE - BEFORE GRADLE CLEAN)
-      # -----------------------------
       - name: Install dependencies
         run: npm ci
 
-      # -----------------------------
-      # 8. Clean Gradle cache (MOVED AFTER NPM INSTALL)
-      # -----------------------------
-      - name: Clean Gradle cache
-        run: |
-          cd android
-          chmod +x ./gradlew
-          ./gradlew clean
-
-      # -----------------------------
-      # 9. Check environment
-      # -----------------------------
-      - name: Check environment
-        run: |
-          echo "Node:"
-          node --version
-
-          echo "Java:"
-          java -version
-
-          echo "Android SDK:"
-          echo "$ANDROID_HOME"
-
-          echo "Installed Android platforms:"
-          sdkmanager --list_installed | grep "platforms;android" || true
-
-      # -----------------------------
-      # 10. Build Release APK
-      # -----------------------------
       - name: Build release APK
         run: |
           cd android
           chmod +x ./gradlew
           ./gradlew assembleRelease \
-          --no-daemon \
-          --max-workers=2 \
-          -Dorg.gradle.parallel=false \
-          --warning-mode all \
-          --stacktrace
+            --no-daemon \
+            --max-workers=2 \
+            -Dorg.gradle.parallel=false \
+            --warning-mode all \
+            --stacktrace
 
-      # -----------------------------
-      # 11. Locate APK
-      # -----------------------------
       - name: Locate APK
         id: apk
-        shell: bash
         run: |
-          APK_PATH=$(find android/app/build/outputs/apk/release \
-            -type f \
-            -name "*.apk" \
-            -not -name "*unaligned*" \
-            | head -1)
-
-          if [ -z "$APK_PATH" ]; then
-            echo "ERROR: APK was not found!"
-            exit 1
-          fi
-
+          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" -not -name "*unaligned*" | head -1)
           echo "APK found at: $APK_PATH"
-          echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
 
-      # -----------------------------
-      # 12. Rename APK
-      # -----------------------------
-      - name: Prepare release
+      - name: Compress APK to ZIP
         run: |
-          mkdir -p release
-          cp "${{ steps.apk.outputs.apk_path }}" release/DocCanvas.apk
+          ZIP_PATH="${{ steps.apk.outputs.apk_path }}.zip"
+          zip -j "$ZIP_PATH" "${{ steps.apk.outputs.apk_path }}"
+          echo "ZIP created at: $ZIP_PATH"
 
-      # -----------------------------
-      # 13. Enable KVM
-      # -----------------------------
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
-            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
-
-      # -----------------------------
-      # 14. Test APK on emulator
-      # -----------------------------
-      - name: Run release APK on emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          arch: x86_64
-          profile: pixel_6
-          script: |
-            adb install release/DocCanvas.apk
-
-            adb shell monkey \
-              -p com.doccanvas \
-              -c android.intent.category.LAUNCHER 1
-
-            sleep 15
-
-            mkdir -p release
-            adb logcat -d > release/logcat.txt
-
-            adb shell am force-stop com.doccanvas
-
-      # -----------------------------
-      # 15. Upload logcat
-      # -----------------------------
-      - name: Upload logcat
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: doccanvas-release-logcat
-          path: release/logcat.txt
-          if-no-files-found: ignore
-          retention-days: 7
-
-      # -----------------------------
-      # 16. Create ZIP
-      # -----------------------------
-      - name: Compress APK
-        run: |
-          cd release
-          zip DocCanvas.zip DocCanvas.apk
-
-      # -----------------------------
-      # 17. Show release files
-      # -----------------------------
-      - name: Show release files
-        run: |
-          echo "Release files:"
-          ls -lh release/
-
-      # -----------------------------
-      # 18. Upload APK
-      # -----------------------------
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: doccanvas-release-apk
-          path: release/DocCanvas.apk
-          if-no-files-found: error
+          path: ${{ steps.apk.outputs.apk_path }}
           retention-days: 30
 
-      # -----------------------------
-      # 19. Upload ZIP
-      # -----------------------------
-      - name: Upload ZIP
+      - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
           name: doccanvas-release-zip
-          path: release/DocCanvas.zip
-          if-no-files-found: error
+          path: ${{ steps.apk.outputs.apk_path }}.zip
           retention-days: 30
-
-      # -----------------------------
-      # 20. Upload R8 missing rules
-      # -----------------------------
-      - name: Upload R8 missing rules
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: r8-missing-rules
-          path: android/app/build/outputs/mapping/release/missing_rules.txt
-          if-no-files-found: ignore
-          retention-days: 7
