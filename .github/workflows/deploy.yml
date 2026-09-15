@@ -28,10 +28,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 35
-          build-tools: 35.0.0
-          ndk: 27.0.12077973
-          packages: 'platforms;android-35 build-tools;35.0.0 ndk;27.0.12077973'
+         api-level: 35
+         build-tools: 35.0.0
+         ndk: 27.0.12077973
+         cmdline-tools-version: latest
 
       - name: Accept Android SDK Licenses
         run: |
