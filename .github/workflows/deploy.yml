@@ -61,6 +61,15 @@ jobs:
         run: |
           yes | sdkmanager --licenses || true
 
+      # -----------------------------
+      # 7. Install npm dependencies (MOVED HERE - BEFORE GRADLE CLEAN)
+      # -----------------------------
+      - name: Install dependencies
+        run: npm ci
+
+      # -----------------------------
+      # 8. Clean Gradle cache (MOVED AFTER NPM INSTALL)
+      # -----------------------------
       - name: Clean Gradle cache
         run: |
           cd android
@@ -68,13 +77,7 @@ jobs:
           ./gradlew clean
 
       # -----------------------------
-      # 7. Install npm dependencies
-      # -----------------------------
-      - name: Install dependencies
-        run: npm ci
-
-      # -----------------------------
-      # 8. Check environment
+      # 9. Check environment
       # -----------------------------
       - name: Check environment
         run: |
@@ -91,7 +94,7 @@ jobs:
           sdkmanager --list_installed | grep "platforms;android" || true
 
       # -----------------------------
-      # 9. Build Release APK
+      # 10. Build Release APK
       # -----------------------------
       - name: Build release APK
         run: |
@@ -105,7 +108,7 @@ jobs:
           --stacktrace
 
       # -----------------------------
-      # 10. Locate APK
+      # 11. Locate APK
       # -----------------------------
       - name: Locate APK
         id: apk
@@ -126,7 +129,7 @@ jobs:
           echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
 
       # -----------------------------
-      # 11. Rename APK
+      # 12. Rename APK
       # -----------------------------
       - name: Prepare release
         run: |
@@ -134,7 +137,7 @@ jobs:
           cp "${{ steps.apk.outputs.apk_path }}" release/DocCanvas.apk
 
       # -----------------------------
-      # 12. Enable KVM
+      # 13. Enable KVM
       # -----------------------------
       - name: Enable KVM
         run: |
@@ -145,7 +148,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       # -----------------------------
-      # 13. Test APK on emulator
+      # 14. Test APK on emulator
       # -----------------------------
       - name: Run release APK on emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -168,7 +171,7 @@ jobs:
             adb shell am force-stop com.doccanvas
 
       # -----------------------------
-      # 14. Upload logcat
+      # 15. Upload logcat
       # -----------------------------
       - name: Upload logcat
         if: always()
@@ -180,7 +183,7 @@ jobs:
           retention-days: 7
 
       # -----------------------------
-      # 15. Create ZIP
+      # 16. Create ZIP
       # -----------------------------
       - name: Compress APK
         run: |
@@ -188,7 +191,7 @@ jobs:
           zip DocCanvas.zip DocCanvas.apk
 
       # -----------------------------
-      # 16. Show release files
+      # 17. Show release files
       # -----------------------------
       - name: Show release files
         run: |
@@ -196,7 +199,7 @@ jobs:
           ls -lh release/
 
       # -----------------------------
-      # 17. Upload APK
+      # 18. Upload APK
       # -----------------------------
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -207,7 +210,7 @@ jobs:
           retention-days: 30
 
       # -----------------------------
-      # 18. Upload ZIP
+      # 19. Upload ZIP
       # -----------------------------
       - name: Upload ZIP
         uses: actions/upload-artifact@v4
@@ -218,7 +221,7 @@ jobs:
           retention-days: 30
 
       # -----------------------------
-      # 19. Upload R8 missing rules
+      # 20. Upload R8 missing rules
       # -----------------------------
       - name: Upload R8 missing rules
         if: failure()
