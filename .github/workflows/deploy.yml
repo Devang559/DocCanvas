@@ -25,11 +25,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK (cmdline-tools + licenses)
         uses: android-actions/setup-android@v3
         with:
           accept-android-sdk-licenses: true
-          packages: platforms;android-34 build-tools;34.0.0 platform-tools ndk;26.1.10909125
+
+      - name: Install required SDK packages
+        run: |
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" "ndk;26.1.10909125"
 
       - name: Install dependencies
         run: npm ci
