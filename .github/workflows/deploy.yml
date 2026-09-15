@@ -25,35 +25,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Android SDK packages
-        run: |
-          # Discover sdkmanager
-          SDK_MANAGER=""
-          if command -v sdkmanager >/dev/null 2>&1; then
-            SDK_MANAGER=$(command -v sdkmanager)
-          fi
-          for candidate in \
-            "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager" \
-            "${ANDROID_HOME:-/usr/local/lib/android/sdk}/tools/bin/sdkmanager" \
-            "${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager" \
-            "${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}/tools/bin/sdkmanager" \
-            "/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager" \
-            "/usr/local/lib/android/sdk/tools/bin/sdkmanager"; do
-            if [ -f "$candidate" ] && [ -z "$SDK_MANAGER" ]; then
-              SDK_MANAGER="$candidate"
-            fi
-          done
-          echo "Using sdkmanager: $SDK_MANAGER"
-          yes | $SDK_MANAGER --update || true
-          yes | $SDK_MANAGER \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0" \
-            "ndk;27.0.12077973"
-          yes | $SDK_MANAGER --licenses || true
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
-          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          api-level: 35
+          build-tools: 35.0.0
+          ndk: 27.0.12077973
 
       - name: Install dependencies
         run: npm ci
