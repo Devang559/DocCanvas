@@ -32,7 +32,6 @@ jobs:
           build-tools: 34.0.0
           ndk: 26.1.10909125
           cache: true
-          packages: tools
 
       - name: Accept Android SDK Licenses
         run: |
