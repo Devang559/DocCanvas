@@ -11,18 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      # CHANGE THIS to your actual Android applicationId
       PACKAGE_NAME: com.doccanvas
 
     steps:
+      # --------------------------------
+      # Checkout
+      # --------------------------------
       - name: Checkout code
         uses: actions/checkout@v5
 
+      # --------------------------------
+      # Node.js
+      # --------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
+      # --------------------------------
+      # Java
+      # --------------------------------
       - name: Setup Java 17
         uses: actions/setup-java@v5
         with:
@@ -30,7 +40,9 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      # Setup Android SDK without the deprecated "tools" package
+      # --------------------------------
+      # Android SDK
+      # --------------------------------
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
@@ -46,15 +58,50 @@ jobs:
         run: |
           yes | sdkmanager --licenses || true
 
+      # --------------------------------
+      # Node dependencies
+      # --------------------------------
       - name: Install dependencies
         run: npm ci
 
+      # --------------------------------
+      # Diagnostics
+      # --------------------------------
+      - name: Check disk space
+        run: |
+          echo "===== DISK SPACE ====="
+          df -h
+
+          echo "===== MEMORY ====="
+          free -h
+
+      # --------------------------------
+      # Gradle clean
+      # --------------------------------
+      - name: Clean Gradle project
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew clean --no-daemon
+
+      # --------------------------------
+      # Build Release APK
+      # --------------------------------
       - name: Build release APK
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleRelease --no-daemon -i
 
+          export GRADLE_USER_HOME="$GITHUB_WORKSPACE/.gradle"
+
+          ./gradlew assembleRelease \
+            --no-daemon \
+            --max-workers=2 \
+            -Dorg.gradle.parallel=false
+
+      # --------------------------------
+      # Locate APK
+      # --------------------------------
       - name: Locate APK
         id: apk
         shell: bash
@@ -73,11 +120,17 @@ jobs:
           echo "APK found at: $APK_PATH"
           echo "apk_path=$APK_PATH" >> "$GITHUB_OUTPUT"
 
+      # --------------------------------
+      # Prepare release directory
+      # --------------------------------
       - name: Rename APK
         run: |
           mkdir -p release
           cp "${{ steps.apk.outputs.apk_path }}" release/DocCanvas.apk
 
+      # --------------------------------
+      # Enable KVM
+      # --------------------------------
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
@@ -86,7 +139,10 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Run release APK on emulator and capture logcat
+      # --------------------------------
+      # Test APK on Android Emulator
+      # --------------------------------
+      - name: Run release APK on emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -95,16 +151,25 @@ jobs:
           script: |
             adb install release/DocCanvas.apk
 
+            echo "Starting application..."
+
             adb shell monkey \
               -p "$PACKAGE_NAME" \
               -c android.intent.category.LAUNCHER 1
 
             sleep 15
 
+            echo "Capturing logcat..."
+
             adb logcat -d > release/logcat.txt
+
+            echo "Stopping application..."
 
             adb shell am force-stop "$PACKAGE_NAME"
 
+      # --------------------------------
+      # Upload Logcat
+      # --------------------------------
       - name: Upload logcat artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -114,16 +179,25 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      # --------------------------------
+      # Compress APK
+      # --------------------------------
       - name: Compress APK to ZIP
         run: |
           cd release
           zip DocCanvas.zip DocCanvas.apk
 
+      # --------------------------------
+      # Show release files
+      # --------------------------------
       - name: Show release files
         run: |
-          echo "Release files:"
+          echo "===== RELEASE FILES ====="
           ls -lh release/
 
+      # --------------------------------
+      # Upload APK
+      # --------------------------------
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -132,6 +206,9 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # --------------------------------
+      # Upload ZIP
+      # --------------------------------
       - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
@@ -140,6 +217,9 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # --------------------------------
+      # Upload R8 missing rules if available
+      # --------------------------------
       - name: Upload R8 missing rules on failure
         if: failure()
         uses: actions/upload-artifact@v4
