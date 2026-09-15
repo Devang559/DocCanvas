@@ -32,6 +32,15 @@ jobs:
           build-tools: 34.0.0
           ndk: 26.1.10909125
           cache: true
+          packages: |
+            platforms;android-34
+            build-tools;34.0.0
+            ndk;26.1.10909125
+            cmdline-tools;latest
+
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Accept Android SDK Licenses
         run: |
